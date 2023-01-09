@@ -195,3 +195,135 @@ cln_df %>%
 # this case.
 # model_code = "outcome =~ current_margin_fcst_plan_sale + overall_customer_experience_avg + 
 #                           overall_project_team_experience_avg + log_hours + injury_contract_value"
+
+
+# as hours increase, project team experience tends to decrease
+df_cln_no_missing %>% 
+  mutate(group = cut(recorded_project_hours, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_project_team_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+# as hours increase, customer team experience tends to decrease (though less consistently)
+df_cln_no_missing %>% 
+  mutate(group = cut(recorded_project_hours, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_customer_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+
+# No clear relationship with contract value and team experience
+df_cln_no_missing %>% 
+  mutate(group = cut(current_margin_fcst_plan_sale, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_project_team_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+# unclear relationship between contract value and customer experience; may be unrelated
+df_cln_no_missing %>% 
+  mutate(group = cut(square_footage, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(current_margin_fcst_plan_sale, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+
+# No clear relationship with contract value and team experience
+df_cln_no_missing %>% 
+  mutate(group = cut(recorded_project_hours, 10)) %>% 
+  group_by(group, primary_og_og_name) %>% 
+  summarise(avg_value = mean(overall_project_team_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  facet_wrap(~primary_og_og_name)
+
+# unclear relationship between contract value and customer experience; may be unrelated
+df_cln_no_missing %>% 
+  mutate(group = cut(recorded_project_injuries, 10)) %>% 
+  group_by(group, primary_og_og_name) %>% 
+  summarise(avg_value = mean(overall_customer_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  facet_wrap(~primary_og_og_name)
+
+in_eda <- read.xlsx("~\\Code\\project-scorecard\\data\\TCH Data.xlsx", 
+                    sheet = "Data Pivot") %>% 
+  clean_names() 
+
+df_eda <- in_eda %>% 
+  left_join(df_cln_no_missing, by = c("row_labels"="oracle_project_number"))
+
+df_eda %>% 
+  mutate(group = cut(average_of_act_craft_ot_percent, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_customer_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+df_eda %>% 
+  mutate(group = cut(average_of_act_craft_ot_percent, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_project_team_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+df_eda %>% 
+  mutate(group = cut(average_of_act_craft_dt_percent, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_customer_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+df_eda %>% 
+  mutate(group = cut(average_of_act_craft_dt_percent, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_project_team_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+df_eda %>% 
+  mutate(group = cut(average_of_act_craft_nt_percent, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_customer_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+df_eda %>% 
+  mutate(group = cut(average_of_act_craft_nt_percent, 10)) %>% 
+  group_by(group) %>% 
+  summarise(avg_value = mean(overall_project_team_experience_avg, na.rm = TRUE) ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = group, y = avg_value)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+anti_join(in_eda, df_cln_no_missing, by = c("row_labels" = "oracle_project_number"))
+
+anti_join(df_cln_no_missing, in_eda, by = c("oracle_project_number" ="row_labels"))
+
+
