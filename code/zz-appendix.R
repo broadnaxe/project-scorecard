@@ -109,7 +109,7 @@ df_complete %>%
 
 #####--------------------------- Additional Diagnostics -------------#####
 
-# check for consistent variances
+# check for consistent variances (~factor of 10)
 var(df_cln_no_missing$scale_margin)
 var(df_cln_no_missing$scale_cust_exp)
 var(df_cln_no_missing$scale_team_exp)
@@ -179,6 +179,20 @@ explanatory <- c("overall_project_team_experience_avg", "overall_customer_experi
 cln_df %>% 
   dplyr::select(explanatory) %>% 
   MissMech::TestMCARNormality()
+
+#####--------------------------- Create Clusters ---------------------------#####
+
+library(factoextra)
+library(cluster)
+
+df_cluster <- df_cln_no_missing %>% 
+  select(-square_footage) %>% 
+  select(is.numeric)
+
+km <- kmeans(df_cluster, 2, iter.max = 10, nstart = 1)
+
+fviz_cluster(km, data = df_cluster)
+aggregate(df_cluster, by=list(cluster=km$cluster), mean)
 
 
 
