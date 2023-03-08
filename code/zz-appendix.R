@@ -115,6 +115,8 @@ var(df_cln_no_missing$scale_cust_exp)
 var(df_cln_no_missing$scale_team_exp)
 var(df_cln_no_missing$log_hours)
 var(df_cln_no_missing$scale_inj_contract)
+var(df_cln_no_missing$scale_log_rfi_count)
+
 
 # check distributions of features used
 # because of skew persistent (particularly in log & survey data that can't be removed), adjusted estimator to robust option
@@ -123,22 +125,18 @@ hist(df_cln_no_missing$scale_cust_exp)
 hist(df_cln_no_missing$scale_team_exp)
 hist(df_cln_no_missing$log_hours)
 hist(df_cln_no_missing$scale_inj_contract)
+hist(df_cln_no_missing$scale_log_rfi_count)
 
 
 # COMPUTE CORRELATIONS
 df_corr <- df_cln_no_missing %>% 
-  filter(!is.na(trir)) %>% 
-  filter(!is.na(initial_contract_value)) %>% 
-  dplyr::select(scale_margin, 
-                scale_cust_exp, 
-                scale_team_exp, 
-                log_hours,
-                initial_contract_value,
-                recorded_project_injuries,
-                scale_inj_contract)
+  dplyr::select_if(is.numeric) %>% 
+  dplyr::select(-overall_project_team_experience_avg,
+                -square_footage,
+                -scale_team_exp)
 
 # graph correlation matrix
-chart.Correlation(cor(df_corr))
+PerformanceAnalytics::chart.Correlation(cor(df_corr))
 
 # compute partial correlations
 pcor(df_corr)
@@ -155,17 +153,18 @@ model <- lm(outcome ~ scale_margin +
               scale_cust_exp + 
               scale_team_exp + 
               log_hours +
-              scale_inj_contract, data = df_complete)
+              scale_inj_contract +
+              scale_log_rfi_count, data = df_complete)
 
-vif(model)
+car::vif(model)
 
 
 # EVALUATE MISSINGNESS
 # need to evaluate type of missing-ness within the data to use mice imputation
-n_miss(df_cln)
+n_miss(df_cln_no_missing)
 prop_miss(df_cln)
-miss_var_summary(df_cln)
-gg_miss_var(df_cln)
+miss_var_summary(df_cln_no_missing)
+gg_miss_var(df_cln_no_missing)
 
 # Where are missings located?
 vis_miss(df_cln) + 
